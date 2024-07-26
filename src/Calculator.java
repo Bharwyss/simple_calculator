@@ -157,7 +157,7 @@ public class Calculator
         if (continueOperation)
         {
             // If yes, go back to ADD_INPUT2 state for another operation
-            state = ADD_INPUT2;
+            state = ADD_SYMBOL;
         }
         else
         {
