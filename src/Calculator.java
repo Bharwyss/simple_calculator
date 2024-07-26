@@ -130,7 +130,7 @@ public class Calculator
         }
         else
         {
-            // Otherwise, go to the RESULT state
+            // Otherwise, go to the ADD_INPUT2 state
             state = ADD_INPUT2;
         }
     }
@@ -156,7 +156,7 @@ public class Calculator
         boolean continueOperation = askYesOrNo("Continue operation?");
         if (continueOperation)
         {
-            // If yes, go back to ADD_INPUT2 state for another operation
+            // If yes, go back to ADD_SYMBOL state for another operation
             state = ADD_SYMBOL;
         }
         else
