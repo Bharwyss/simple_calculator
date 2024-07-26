@@ -2,11 +2,11 @@
 public class CalculatorMathLogic
 {
     /** Constants */
-    protected static final int ADDITION = 0;
-    protected static final int SUBTRACTION = 1;
-    protected static final int MULTIPLICATION = 2;
-    protected static final int DIVISION = 3;
-    protected static final int RESET = 4;
+    protected static final char ADDITION = '+';
+    protected static final char SUBTRACTION = '-';
+    protected static final char MULTIPLICATION = '*';
+    protected static final char DIVISION = '/';
+    protected static final char RESET = '.';
 
     /** Fields */
     // Subtotal is the current number
@@ -21,7 +21,7 @@ public class CalculatorMathLogic
     }
 
     // Method to choose the next mathematical operation
-    public void chooseOperation(int choice, double value)
+    public void chooseOperation(char choice, double value)
     {
         // Determine the operation based on user's choice
         switch (choice)
@@ -84,7 +84,7 @@ public class CalculatorMathLogic
         }
         else
         {
-            System.out.println("Error: Division by zero");
+            System.out.println("Error: Division by zero.");
         }
     }
 }

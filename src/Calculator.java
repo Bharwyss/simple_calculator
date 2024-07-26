@@ -1,4 +1,5 @@
 import java.util.Scanner;
+import java.util.Locale;
 
 // Class that holds the input/output logic, and displays the data
 public class Calculator
@@ -18,7 +19,7 @@ public class Calculator
     // Current state of calculator
     protected static int state = START;
     // Choice of symbol from user
-    protected static int choice;
+    protected static char choice;
     // Choice of second value from user
     protected static double value;
 
@@ -26,6 +27,7 @@ public class Calculator
     public static void main(String[] args)
     {
         // Initialize the math logic
+        scanner.useLocale(Locale.US);
         mathLogic = new CalculatorMathLogic();
         // Start the calculator process
         setCalculator();
@@ -36,18 +38,10 @@ public class Calculator
     {
         while (true)
         {
-            System.out.println("Choose a number between 0 and 9:");
+            System.out.println("Choose a number.");
             if (scanner.hasNextDouble())
             {
-                double value = scanner.nextDouble();
-                if (value < 10 && value >= 0)
-                {
-                    return value;
-                }
-                else
-                {
-                    System.out.println("Wrong input. Please enter a number between 0 and 9.");
-                }
+                return scanner.nextDouble();
             }
             else
             {
@@ -58,27 +52,23 @@ public class Calculator
     }
 
     // Method that asks what kind of operation the user wants
-    public static int getChoiceUser(double value)
+    public static char getChoiceUser(double value)
     {
         while (true)
         {
-            System.out.println("Choose an operator: +, -, x, /; Press . to reset");
+            System.out.println("Choose an operator: +, -, *, /; Press . to reset.");
             switch (scanner.next().charAt(0))
             {
                 case '+':
-                    System.out.println("Current subtotal = " + mathLogic.getSubtotal() + " + " + value);
-                    return 0;
+                    return '+';
                 case '-':
-                    System.out.println("Current subtotal = " + mathLogic.getSubtotal() + " - " + value);
-                    return 1;
-                case 'x':
-                    System.out.println("Current subtotal = " + mathLogic.getSubtotal() + " x " + value);
-                    return 2;
+                    return '-';
+                case '*':
+                    return '*';
                 case '/':
-                    System.out.println("Current subtotal = " + mathLogic.getSubtotal() + " / " + value);
-                    return 3;
+                    return '/';
                 case '.':
-                    return 4;
+                    return '.';
                 default:
                     System.out.println("Invalid input. Please enter a valid operator.");
             }
@@ -124,7 +114,25 @@ public class Calculator
         // Get the first number input from user
         mathLogic.setSubtotal(getNumberUser());
         // Move to the next state
-        state = ADD_INPUT2;
+        state = ADD_SYMBOL;
+    }
+
+
+    // Method to add symbol from user
+    public static void setAddSymbol()
+    {
+        // Get the operator input from user
+        choice = getChoiceUser(value);
+        // If user chooses reset, go to the START state
+        if (choice == '.')
+        {
+            state = START;
+        }
+        else
+        {
+            // Otherwise, go to the RESULT state
+            state = ADD_INPUT2;
+        }
     }
 
     // Method to add input2 from user
@@ -133,24 +141,8 @@ public class Calculator
         // Get the second number input from user
         value = getNumberUser();
         // Move to the next state
-        state = ADD_SYMBOL;
-    }
-
-    // Method to add symbol from user
-    public static void setAddSymbol()
-    {
-        // Get the operator input from user
-        choice = getChoiceUser(value);
-        // If user chooses reset, go to the START state
-        if (choice == 4)
-        {
-            state = START;
-        }
-        else
-        {
-            // Otherwise, go to the RESULT state
-            state = RESULT;
-        }
+        System.out.println("The current operation is : " + mathLogic.getSubtotal() + " " + choice + " " + value );
+        state = RESULT;
     }
 
     // Method to show result and ask for more operations
@@ -159,7 +151,7 @@ public class Calculator
         // Perform the chosen operation
         mathLogic.chooseOperation(choice, value);
         // Display the result of the operation
-        System.out.println("This operation equals = " + mathLogic.getSubtotal());
+        System.out.println("This operation equals " + mathLogic.getSubtotal());
         // Ask if the user wants to continue
         boolean continueOperation = askYesOrNo("Continue operation?");
         if (continueOperation)
