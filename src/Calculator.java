@@ -1,196 +1,179 @@
 import java.util.Scanner;
-import java.util.Locale;
+import java.util.Stack;
 
-// Class that holds the input/output logic, and displays the data
 public class Calculator
 {
-    /** Constants */
-    protected static final int START = 0;
-    protected static final int ADD_INPUT1 = 1;
-    protected static final int ADD_INPUT2 = 2;
-    protected static final int ADD_SYMBOL = 3;
-    protected static final int RESULT = 4;
-
-    /** Fields */
     // Scanner that reads user input
-    protected static Scanner scanner = new Scanner(System.in);
-    // Current mathematical state of the calculator
-    protected static CalculatorMathLogic mathLogic;
-    // Current state of calculator
-    protected static int state = START;
-    // Choice of symbol from user
-    protected static char choice;
-    // Choice of second value from user
-    protected static double value;
+    private static final Scanner scanner = new Scanner(System.in);
 
-    /** Methods */
+    // String builder to form new numbers
+    private final StringBuilder numberBuilder = new StringBuilder();
+
+    // Stack of operands
+    private final Stack<CalculatorNodes> operandStack = new Stack<>();
+    // Stack of operators
+    private final Stack<String> operatorStack = new Stack<>();
+
+    // Flag to form decimal numbers.
+    private boolean isDotPresent = false;
+
+    // Main method
     public static void main(String[] args)
     {
-        // Initialize the math logic
-        scanner.useLocale(Locale.US);
-        mathLogic = new CalculatorMathLogic();
-        // Start the calculator process
-        setCalculator();
+        Calculator calculator = new Calculator();
+        String expression = getStringUser();
+        CalculatorNodes expressionTree = calculator.parseExpression(expression);
+        double result = expressionTree.evaluate();
+        System.out.println("The result is: " + result);
     }
 
-    // Method to handle user input for numbers
-    public static double getNumberUser()
+    // Method to ask the user for input
+    public static String getStringUser()
     {
-        while (true)
+        System.out.println("Type a mathematical operation:");
+        return scanner.nextLine();
+    }
+
+    // Analyze the numberBuilder and handle the last number in the string and reset flag
+    public void updateNumberBuilder()
+    {
+        // If the number builder have digits, push them into the operandStack as a String, reset its length to 0
+        if (numberBuilder.length() > 0) {
+            operandStack.push(new CalculatorNodes(numberBuilder.toString()));
+            numberBuilder.setLength(0);
+            isDotPresent = false; // Reset for the next number
+        }
+    }
+
+    // Pop the last value in operatorStack, the last 2 operands in operandStack,
+    // and pass those arguments into a new node into operandStack
+    public void updateStacks()
+    {
+        String operator = operatorStack.pop(); // Put the value of the last operator in stack into
+        // a String to be passed as an argument for the next node
+        CalculatorNodes rightOperand = operandStack.pop(); // Pop last operand into a node that will be the right child
+        CalculatorNodes leftOperand = operandStack.pop(); // Pop last operand into a node that will be the left child
+        operandStack.push(new CalculatorNodes(operator, leftOperand, rightOperand)); // Create a new node with arguments
+    }
+
+    // Analyze the current character if it's a digit or a decimal point and add them to the numberBuilder
+    public void analyzeDigit(char currentChar)
+    {
+        if (currentChar == '.' && !isDotPresent)
         {
-            System.out.println("Choose a number.");
-            if (scanner.hasNextDouble())
+            isDotPresent = true;
+            numberBuilder.append(currentChar); // Add to the number builder to create decimals
+        } else if (Character.isDigit(currentChar))
+        {
+            numberBuilder.append(currentChar);
+        }
+    }
+
+    // Handle operator analysis and precedence
+    public void analyzeOperator(char currentChar)
+    {
+        updateNumberBuilder(); // Add the current digits value into an operand node, into the operand stack
+        while (!operatorStack.isEmpty() && precedence(operatorStack.peek())
+                >= precedence(Character.toString(currentChar))) // Until operatorStack is
+            // empty and the level of precedence of the last operator in stack is lesser than the current operator
+        {
+            updateStacks();
+        }
+        operatorStack.push(Character.toString(currentChar)); // Push the operator into the operator list
+    }
+
+    // Handle opening parenthesis
+    public void analyzeOpeningParenthesis(char previousChar)
+    {
+        updateNumberBuilder(); // Add the current digits value into an operand node, into the operand stack
+        // If the previous character is a digit, or a closing parenthesis, add * into the operator list to act as a multiplication
+        if (Character.isDigit(previousChar) || previousChar == ')')
+        {
+            operatorStack.push("*");
+        }
+        operatorStack.push("(");
+    }
+
+    // Handle closing parenthesis
+    public void analyzeClosingParenthesis()
+    {
+        updateNumberBuilder(); // Add the current digits value into an operand node, into the operand stack
+        while (!operatorStack.peek().equals("(")) // Until the operator "(" is the last in stack
+        {
+            updateStacks();
+        }
+        operatorStack.pop(); // Remove the ( from the stack
+    }
+
+    // Define what is an operator
+    private boolean isOperator(char character)
+    {
+        return character == '+' || character == '-' || character == '*' || character == '/';
+    }
+
+    // Determine operator precedence
+    private int precedence(String operator)
+    {
+        switch (operator)
+        {
+            // Addition and subtraction are 1 because multiplication and division have priority over them, those are 2
+            case "+":
+            case "-":
+                return 1;
+            case "*":
+            case "/":
+                return 2;
+            default:
+                return 0;
+        }
+    }
+
+    // Parse the expression into an expression tree
+    public CalculatorNodes parseExpression(String expression)
+    {
+        int length = expression.length();
+
+        for (int i = 0; i < length; i++)
+        {
+            char currentChar = expression.charAt(i); // The current character of the string provided by the user
+            char previousChar; // The previous character of the string provided by the user
+            if (i > 0)
             {
-                return scanner.nextDouble();
+                previousChar = expression.charAt(i - 1);
             }
             else
             {
-                System.out.println("Wrong input. Please enter a valid number.");
-                scanner.next();
+                previousChar = '\0'; // '\0' is a null character, used here to represent no previous character
             }
-        }
-    }
 
-    // Method that asks what kind of operation the user wants
-    public static char getChoiceUser(double value)
-    {
-        while (true)
-        {
-            System.out.println("Choose an operator: +, -, *, /; Press . to reset.");
-            switch (scanner.next().charAt(0))
+            if (Character.isDigit(currentChar) || currentChar == '.')
             {
-                case '+':
-                    return '+';
-                case '-':
-                    return '-';
-                case '*':
-                    return '*';
-                case '/':
-                    return '/';
-                case '.':
-                    return '.';
-                default:
-                    System.out.println("Invalid input. Please enter a valid operator.");
+                analyzeDigit(currentChar);
             }
-        }
-    }
-
-    // Method that returns true or false based on user input for yes/no questions
-    public static boolean askYesOrNo(String message)
-    {
-        while (true)
-        {
-            System.out.println(message);
-            String input = scanner.next().toLowerCase();
-            if (input.equals("yes"))
+            else if (isOperator(currentChar))
             {
-                return true;
+                analyzeOperator(currentChar);
             }
-            else if (input.equals("no"))
+            else if (currentChar == '(')
             {
-                return false;
+                analyzeOpeningParenthesis(previousChar);
             }
-            else
+            else if (currentChar == ')')
             {
-                System.out.println("Invalid input. Please enter 'yes' or 'no'.");
+                analyzeClosingParenthesis();
             }
         }
-    }
 
-    // Method to start the Calculator
-    public static void setStart()
-    {
-        // Reset subtotal to 0
-        mathLogic.setSubtotal(0);
-        // Display the current subtotal
-        System.out.println("Current subtotal = " + mathLogic.getSubtotal());
-        // Move to the next state
-        state = ADD_INPUT1;
-    }
+        // Handle the last number in the string
+        updateNumberBuilder();
 
-    // Method to add input1 from user
-    public static void setAddInput1()
-    {
-        // Get the first number input from user
-        mathLogic.setSubtotal(getNumberUser());
-        // Move to the next state
-        state = ADD_SYMBOL;
-    }
-
-
-    // Method to add symbol from user
-    public static void setAddSymbol()
-    {
-        // Get the operator input from user
-        choice = getChoiceUser(value);
-        // If user chooses reset, go to the START state
-        if (choice == '.')
+        // Process remaining operators in the stack
+        while (!operatorStack.isEmpty())
         {
-            state = START;
+            updateStacks();
         }
-        else
-        {
-            // Otherwise, go to the ADD_INPUT2 state
-            state = ADD_INPUT2;
-        }
-    }
 
-    // Method to add input2 from user
-    public static void setAddInput2()
-    {
-        // Get the second number input from user
-        value = getNumberUser();
-        // Move to the next state
-        System.out.println("The current operation is : " + mathLogic.getSubtotal() + " " + choice + " " + value );
-        state = RESULT;
-    }
-
-    // Method to show result and ask for more operations
-    public static void setResult()
-    {
-        // Perform the chosen operation
-        mathLogic.chooseOperation(choice, value);
-        // Display the result of the operation
-        System.out.println("This operation equals " + mathLogic.getSubtotal());
-        // Ask if the user wants to continue
-        boolean continueOperation = askYesOrNo("Continue operation?");
-        if (continueOperation)
-        {
-            // If yes, go back to ADD_SYMBOL state for another operation
-            state = ADD_SYMBOL;
-        }
-        else
-        {
-            // Otherwise, reset and go to the START state
-            mathLogic.chooseOperation(CalculatorMathLogic.RESET, 0);
-            state = START;
-        }
-    }
-
-    // Method to run the calculator
-    public static void setCalculator()
-    {
-        // Loop through the states of the calculator
-        while (true)
-        {
-            switch (state)
-            {
-                case START:
-                    setStart();
-                    break;
-                case ADD_INPUT1:
-                    setAddInput1();
-                    break;
-                case ADD_INPUT2:
-                    setAddInput2();
-                    break;
-                case ADD_SYMBOL:
-                    setAddSymbol();
-                    break;
-                case RESULT:
-                    setResult();
-                    break;
-            }
-        }
+        // The final tree is in the operand stack
+        return operandStack.pop();
     }
 }
