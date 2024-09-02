@@ -1,5 +1,3 @@
-import java.util.ArrayList;
-
 // Class that holds the mathematical operation logic
 public class CalculatorNodes {
 
@@ -20,12 +18,13 @@ public class CalculatorNodes {
     public CalculatorNodes(String value, CalculatorNodes left, CalculatorNodes right)
     {
         this.value = value; // Updating the value by the argument
-        this.left = left; // Updating the left child by another node
-        this.right = right; // Updating the right child by another node
+        this.left = left; // Updating the left child to another node
+        this.right = right; // Updating the right child to another node
     }
 
     // Method to evaluate the expression tree
-    public double evaluate() {
+    public double evaluate()
+    {
         // If the node is a leaf node, return its value
         if (left == null && right == null) {
             return Double.parseDouble(value);

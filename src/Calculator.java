@@ -53,33 +53,38 @@ public class Calculator
         // a String to be passed as an argument for the next node
         CalculatorNodes rightOperand = operandStack.pop(); // Pop last operand into a node that will be the right child
         CalculatorNodes leftOperand = operandStack.pop(); // Pop last operand into a node that will be the left child
-        operandStack.push(new CalculatorNodes(operator, leftOperand, rightOperand)); // Create a new node with arguments
+        operandStack.push(new CalculatorNodes(operator, leftOperand, rightOperand)); // Create a new node with previous arguments
     }
 
-    // Analyze the current character if it's a digit or a decimal point and add them to the numberBuilder
+    // Analyze the current character, if it's a digit or a decimal point and add them to the numberBuilder
     public void analyzeDigit(char currentChar)
     {
         if (currentChar == '.' && !isDotPresent)
         {
             isDotPresent = true;
             numberBuilder.append(currentChar); // Add to the number builder to create decimals
-        } else if (Character.isDigit(currentChar))
+        }
+        else if (Character.isDigit(currentChar))
         {
             numberBuilder.append(currentChar);
         }
     }
 
     // Handle operator analysis and precedence
-    public void analyzeOperator(char currentChar)
+    public void analyzeOperator(char currentChar, char previousChar)
     {
         updateNumberBuilder(); // Add the current digits value into an operand node, into the operand stack
-        while (!operatorStack.isEmpty() && precedence(operatorStack.peek())
-                >= precedence(Character.toString(currentChar))) // Until operatorStack is
-            // empty and the level of precedence of the last operator in stack is lesser than the current operator
+        if (!isOperator(previousChar)) // If the previous character isn't an operator
         {
-            updateStacks();
+            while (!operatorStack.isEmpty() && precedence(operatorStack.peek())
+                    >= precedence(Character.toString(currentChar))) // Until operatorStack is
+                // empty and the level of precedence of the last operator in stack is lesser than the current operator
+            {
+                updateStacks(); // Convert the last element of operatorStack as a string to pass value, pop the last two
+                // elements of the operandStack to create children node of the new operator node
+            }
+            operatorStack.push(Character.toString(currentChar)); // Push the operator into the operator list
         }
-        operatorStack.push(Character.toString(currentChar)); // Push the operator into the operator list
     }
 
     // Handle opening parenthesis
@@ -152,7 +157,7 @@ public class Calculator
             }
             else if (isOperator(currentChar))
             {
-                analyzeOperator(currentChar);
+                analyzeOperator(currentChar, previousChar);
             }
             else if (currentChar == '(')
             {
