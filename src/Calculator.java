@@ -17,18 +17,21 @@ public class Calculator {
 
     /** Methods */
     // Main method
-    public static void main(String[] args) {
+    public static void main(String[] args)
+    {
         try {
             Calculator calculator = new Calculator(); // Create a calculator object
             String expression = getStringUser(); // Put input from the user in a String called expression
             CalculatorNodes expressionTree = calculator.parseExpression(expression); // Parse the expression
             double result = expressionTree.evaluate(); // Evaluate the expression once the tree has been made
             System.out.println("The result is: " + result); // Print the result
-        } catch (
+        }
+        catch (
                 IllegalArgumentException e) // Catch specific errors related to invalid arguments (e.g., missing closing parenthesis)
         {
             System.out.println(e.getMessage()); // Display the specific error message provided by the exception
-        } catch (Exception e) // Catch any other unexpected errors
+        }
+        catch (Exception e) // Catch any other unexpected errors
         {
             System.out.println("An unexpected error occurred: " + e.getMessage()); // Display a general error message with details
         }
@@ -41,7 +44,8 @@ public class Calculator {
     }
 
     // Analyze the numberBuilder and handle the last number in the string and reset flag
-    public void updateNumberBuilder() {
+    public void updateNumberBuilder()
+    {
         // If the number builder have digits, push them into the operandStack as a String, reset its length to 0
         if (numberBuilder.length() > 0) {
             operandStack.push(new CalculatorNodes(numberBuilder.toString()));
@@ -52,7 +56,8 @@ public class Calculator {
 
     // Pop the last value in operatorStack, the last 2 operands in operandStack,
     // and pass those arguments into a new node into operandStack
-    public void updateStacks() {
+    public void updateStacks()
+    {
         String operator = operatorStack.pop(); // Put the value of the last operator in stack into
         // a String to be passed as an argument for the next node
         CalculatorNodes rightOperand = operandStack.pop(); // Pop last operand into a node that will be the right child
@@ -61,7 +66,8 @@ public class Calculator {
     }
 
     // Handle digits and decimal points analysis and the numberBuilder construction
-    public void analyzeDigit(char currentChar) {
+    public void analyzeDigit(char currentChar)
+    {
         if (currentChar == '.' && !isDotPresent) {
             isDotPresent = true;
             numberBuilder.append(currentChar); // Add to the number builder to create decimals
@@ -72,7 +78,8 @@ public class Calculator {
 
     // Handle operator analysis and the operator stack flow by pushing operators in the stack if the stack is empty
     // and according to the precedence of the current operator analyzed with the previous one in the stack list.
-    public void analyzeOperator(char currentChar, char previousChar) {
+    public void analyzeOperator(char currentChar, char previousChar)
+    {
         updateNumberBuilder(); // Add the current digits value into an operand node, into the operand stack
         if (!isOperator(previousChar)) // If the previous character isn't an operator
         {
@@ -88,7 +95,8 @@ public class Calculator {
     }
 
     // Handle opening parenthesis analysis and create a subtree
-    public void analyzeOpeningParenthesis(char previousChar) {
+    public void analyzeOpeningParenthesis(char previousChar)
+    {
         updateNumberBuilder(); // Add the current digits value into an operand node, into the operand stack
         // If the previous character is a digit, or a closing parenthesis, add * into the operator list to act as a multiplication
         if (Character.isDigit(previousChar) || previousChar == ')') {
@@ -108,12 +116,14 @@ public class Calculator {
     }
 
     // Define what is an operator
-    private boolean isOperator(char character) {
+    private boolean isOperator(char character)
+    {
         return character == '+' || character == '-' || character == '*' || character == '/' || character == '^';
     }
 
     // Determine operator precedence
-    private int precedence(String operator) {
+    private int precedence(String operator)
+    {
         switch (operator) {
             // Addition and subtraction are 1 because multiplication and division have priority over them, those are 2
             case "+":

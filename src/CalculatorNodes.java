@@ -26,7 +26,8 @@ public class CalculatorNodes
     public double evaluate()
     {
         // If the node is a leaf node, return its value
-        if (left == null && right == null) {
+        if (left == null && right == null)
+        {
             return Double.parseDouble(value);
         }
 
@@ -43,9 +44,12 @@ public class CalculatorNodes
             case "*": // Multiplication
                 return leftValue * rightValue;
             case "/": // Division
-                if (leftValue != 0) {
+                if (leftValue != 0)
+                {
                     return leftValue / rightValue;
-                } else {
+                }
+                else
+                {
                     throw new ArithmeticException("Division by zero.");
                 }
             case "^": // Exponentiation
