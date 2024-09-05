@@ -1,6 +1,6 @@
 // Class that holds the mathematical operation logic
-public class CalculatorNodes {
-
+public class CalculatorNodes
+{
     /** Fields */
     // Contains two children emplacement, and its own value that can be an operand or an operator
     CalculatorNodes left, right;
@@ -36,18 +36,20 @@ public class CalculatorNodes {
 
         // Switch value to do the according mathematical operation and return the result
         switch (value) {
-            case "+":
+            case "+": // Addition
                 return leftValue + rightValue;
-            case "-":
+            case "-": // Subtraction
                 return leftValue - rightValue;
-            case "*":
+            case "*": // Multiplication
                 return leftValue * rightValue;
-            case "/":
+            case "/": // Division
                 if (leftValue != 0) {
                     return leftValue / rightValue;
                 } else {
                     throw new ArithmeticException("Division by zero.");
                 }
+            case "^": // Exponentiation
+                return Math.pow(leftValue, rightValue);
             default:
                 throw new IllegalArgumentException("Unknown operator: " + value);
         }
