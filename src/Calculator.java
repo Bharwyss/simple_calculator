@@ -68,7 +68,7 @@ public class Calculator
     }
 
     // Handle digits and decimal points analysis and the numberBuilder construction
-    public void analyzeDigit(char currentChar)
+    public void analyzeDecimalNumber(char currentChar)
     {
         if (currentChar == '.' && !isDotPresent)
         {
@@ -81,11 +81,21 @@ public class Calculator
         }
     }
 
-    // Handle operator analysis and the operator stack flow by pushing operators in the stack if the stack is empty
-    // and according to the precedence of the current operator analyzed with the previous one in the stack list.
+    // Handle operator analysis and the operator stack flow
     public void analyzeOperator(char currentChar, char previousChar)
     {
-        updateNumberBuilder(); // Add the current digits value into an operand node, into the operand stack
+        updateNumberBuilder(); // Add the current digits value stored of numberBuilder into an operand node, into the operand stack
+
+        // if the operator is '-' and if the previous character is an operator or '(',
+        // or if the previous character is null, treat it as part of the on forming operand
+        if (currentChar == '-' && (isOperator(previousChar) || previousChar == '(' || previousChar == '\0'))
+        {
+            numberBuilder.append(currentChar); // Add '-' to the numberBuilder
+            return; // Exit early since we're treating this as part of a number, not as an operator
+        }
+
+        // Push current char in the operatorStack if the stack is empty. While not and if the precedence of
+        // the current operator analyzed is greater or equal than the one compared to the last one in the stack, update stacks.
         if (!isOperator(previousChar)) // If the previous character isn't an operator
         {
             while (!operatorStack.isEmpty() && precedence(operatorStack.peek())
@@ -182,7 +192,7 @@ public class Calculator
                 // If the current character is a digit or a decimal point, call the corresponding method
                 if (Character.isDigit(currentChar) || currentChar == '.')
                 {
-                    analyzeDigit(currentChar);
+                    analyzeDecimalNumber(currentChar);
                 }
                 // If the current character is an operator, call the corresponding method
                 else if (isOperator(currentChar))
