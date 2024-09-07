@@ -2,7 +2,8 @@ import java.util.EmptyStackException;
 import java.util.Scanner;
 import java.util.Stack;
 
-public class Calculator {
+public class Calculator
+{
     /** Fields */
     // Scanner that reads user input
     private static final Scanner scanner = new Scanner(System.in);
@@ -23,11 +24,10 @@ public class Calculator {
             Calculator calculator = new Calculator(); // Create a calculator object
             String expression = getStringUser(); // Put input from the user in a String called expression
             CalculatorNodes expressionTree = calculator.parseExpression(expression); // Parse the expression
-            double result = expressionTree.evaluate(); // Evaluate the expression once the tree has been made
+            double result = expressionTree.evaluateExpressionTree(); // Evaluate the expression once the tree has been made
             System.out.println("The result is: " + result); // Print the result
         }
-        catch (
-                IllegalArgumentException e) // Catch specific errors related to invalid arguments (e.g., missing closing parenthesis)
+        catch (IllegalArgumentException e) // Catch specific errors related to invalid arguments (e.g., missing closing parenthesis)
         {
             System.out.println(e.getMessage()); // Display the specific error message provided by the exception
         }
@@ -38,7 +38,8 @@ public class Calculator {
     }
 
     // Method to ask the user for input
-    public static String getStringUser() {
+    public static String getStringUser()
+    {
         System.out.println("Type a mathematical operation:");
         return scanner.nextLine();
     }
@@ -47,7 +48,8 @@ public class Calculator {
     public void updateNumberBuilder()
     {
         // If the number builder have digits, push them into the operandStack as a String, reset its length to 0
-        if (numberBuilder.length() > 0) {
+        if (numberBuilder.length() > 0)
+        {
             operandStack.push(new CalculatorNodes(numberBuilder.toString()));
             numberBuilder.setLength(0);
             isDotPresent = false; // Reset for the next number
@@ -68,10 +70,13 @@ public class Calculator {
     // Handle digits and decimal points analysis and the numberBuilder construction
     public void analyzeDigit(char currentChar)
     {
-        if (currentChar == '.' && !isDotPresent) {
+        if (currentChar == '.' && !isDotPresent)
+        {
             isDotPresent = true;
             numberBuilder.append(currentChar); // Add to the number builder to create decimals
-        } else if (Character.isDigit(currentChar)) {
+        }
+        else if (Character.isDigit(currentChar))
+        {
             numberBuilder.append(currentChar);
         }
     }
@@ -99,14 +104,16 @@ public class Calculator {
     {
         updateNumberBuilder(); // Add the current digits value into an operand node, into the operand stack
         // If the previous character is a digit, or a closing parenthesis, add * into the operator list to act as a multiplication
-        if (Character.isDigit(previousChar) || previousChar == ')') {
+        if (Character.isDigit(previousChar) || previousChar == ')')
+        {
             operatorStack.push("*");
         }
         operatorStack.push("(");
     }
 
     // Handle closing parenthesis analysis, update the subtree until the previous operator is a '('
-    public void analyzeClosingParenthesis() {
+    public void analyzeClosingParenthesis()
+    {
         updateNumberBuilder(); // Add the current digits value into an operand node, into the operand stack
         while (!operatorStack.peek().equals("(")) // Until the operator "(" is the last in stack
         {

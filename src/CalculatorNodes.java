@@ -23,7 +23,7 @@ public class CalculatorNodes
     }
 
     // Method to evaluate the expression tree
-    public double evaluate()
+    public double evaluateExpressionTree()
     {
         // If the node is a leaf node, return its value
         if (left == null && right == null)
@@ -32,11 +32,12 @@ public class CalculatorNodes
         }
 
         // if the node is an operator, evaluate his children recursively
-        double leftValue = left.evaluate();
-        double rightValue = right.evaluate();
+        double leftValue = left.evaluateExpressionTree();
+        double rightValue = right.evaluateExpressionTree();
 
         // Switch value to do the according mathematical operation and return the result
-        switch (value) {
+        switch (value)
+        {
             case "+": // Addition
                 return leftValue + rightValue;
             case "-": // Subtraction
@@ -44,7 +45,7 @@ public class CalculatorNodes
             case "*": // Multiplication
                 return leftValue * rightValue;
             case "/": // Division
-                if (leftValue != 0)
+                if (rightValue != 0)
                 {
                     return leftValue / rightValue;
                 }
